@@ -2,7 +2,7 @@ import torch
 from transformers import EsmTokenizer, EsmModel
 from esm.models.esm3 import ESM3
 from esm.utils.constants.models import ESM3_OPEN_SMALL
-from local_models.clss import CLSS
+from models.clss import CLSS
 
 def load_weights_from_checkpoint(checkpoint_path: str, weights_key_prefix: str):
     # Load the checkpoint
