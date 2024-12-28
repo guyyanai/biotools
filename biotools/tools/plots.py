@@ -256,7 +256,7 @@ def create_kde_plot(distributions: List[torch.Tensor], dist_names: List[str], co
     plt.savefig(output_file)
 
     if save_data:
-        save_to_pickle(distributions, f"{output_file.split('.')[:-1]}.pkl")
+        save_to_pickle(distributions, os.path.join(os.path.dirname(output_file), 'data.pkl'))
 
 
 def save_to_pickle(data, path: str):
