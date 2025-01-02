@@ -44,6 +44,7 @@ def apply_pca(data: np.ndarray, n_components=2):
     pca = PCA(n_components=n_components)
     return pca.fit_transform(data)
 
+
 def create_scatter_plot(
     scatter_data: pd.DataFrame,
     title: str,
@@ -207,16 +208,34 @@ def create_pca_plots_with_shape(
         markers=markers,
     )
 
-def create_kde_plot(distributions: List[torch.Tensor], dist_names: List[str], colors: List[str], plot_title: str, output_file: str, x_label: str, y_label = 'Density', mean_line=False, median_line=False, fill_graphs=True, should_normalize=False, save_data=True):
+
+def create_kde_plot(
+    distributions: List[torch.Tensor],
+    dist_names: List[str],
+    colors: List[str],
+    plot_title: str,
+    output_file: str,
+    x_label: str,
+    y_label="Density",
+    mean_line=False,
+    median_line=False,
+    fill_graphs=True,
+    should_normalize=False,
+    save_data=True,
+):
     if len(distributions) != len(colors):
-        raise Exception(f'Received different amounts of distributions ({len(distributions)}) and colors ({len(colors)})')
+        raise Exception(
+            f"Received different amounts of distributions ({len(distributions)}) and colors ({len(colors)})"
+        )
 
     plt.figure(figsize=(12, 6))
 
     for distribution, dist_name, color in zip(distributions, dist_names, colors):
 
         if should_normalize:
-            distribution = (distribution - distribution.min()) / (distribution.max() - distribution.min())
+            distribution = (distribution - distribution.min()) / (
+                distribution.max() - distribution.min()
+            )
 
         distribution = distribution.cpu()
         sns.kdeplot(
@@ -228,17 +247,17 @@ def create_kde_plot(distributions: List[torch.Tensor], dist_names: List[str], co
 
         if mean_line:
             mean = torch.mean(distribution).item()
-            
+
             plt.axvline(
                 mean,
                 color=color,
                 linestyle="--",
                 label=f"Mean {dist_name} ({mean:.2f})",
             )
-        
+
         if median_line:
             median = torch.median(distribution).item()
-        
+
             plt.axvline(
                 median,
                 color=color,
@@ -249,16 +268,18 @@ def create_kde_plot(distributions: List[torch.Tensor], dist_names: List[str], co
     plt.title(plot_title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.legend()
+    plt.legend(loc="center left", bbox_to_anchor=(1, 0.5))
 
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     plt.savefig(output_file)
 
     if save_data:
-        save_to_pickle(distributions, os.path.join(os.path.dirname(output_file), 'data.pkl'))
+        save_to_pickle(
+            distributions, os.path.join(os.path.dirname(output_file), "data.pkl")
+        )
 
 
 def save_to_pickle(data, path: str):
-    with open(path, 'wb') as pickle_file:
+    with open(path, "wb") as pickle_file:
         pickle.dump(data, pickle_file)
