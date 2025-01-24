@@ -276,7 +276,7 @@ def create_kde_plot(
 
     if save_data:
         save_to_pickle(
-            distributions, os.path.join(os.path.dirname(output_file), "data.pkl")
+            distributions, os.path.splitext(output_file)[0] + '.pkl'
         )
 
 
