@@ -228,6 +228,8 @@ def create_kde_plot(
             f"Received different amounts of distributions ({len(distributions)}) and colors ({len(colors)})"
         )
 
+    plt.figure(figsize=(16, 9), constrained_layout=True)
+
     for distribution, dist_name, color in zip(distributions, dist_names, colors):
 
         if should_normalize:
@@ -266,11 +268,10 @@ def create_kde_plot(
     plt.title(plot_title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    plt.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=2)
 
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-    plt.tight_layout()
     plt.savefig(output_file)
 
     if save_data:
