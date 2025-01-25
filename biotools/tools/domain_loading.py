@@ -2,6 +2,7 @@ import os
 import wget
 from esm.sdk.api import ESMProtein
 from esm.utils.structure.protein_chain import ProteinChain
+from typing import List
 
 def read_aa_sequence_from_pdb(file_path: str):
     """
@@ -79,6 +80,7 @@ def load_domain_from_pdb(domain_id: str, structures_base_dir: str, domain_type: 
     try:
         domain_chain = ProteinChain.from_pdb(pdb_file_path)
     except Exception as e:
+        print(f'Failed to read pdb using ProteinChain, error: ', e)
         sequence = read_aa_sequence_from_pdb(pdb_file_path)
         return sequence, None
     
@@ -88,3 +90,21 @@ def load_domain_from_pdb(domain_id: str, structures_base_dir: str, domain_type: 
     coordinates = load_domain.coordinates
     
     return sequence, coordinates
+
+def load_domains_from_pdb(domain_ids: List[str], structures_base_dir: str, domain_type: str, should_download_pdbs: bool, throw_if_failed: bool = False):
+    sequences = []
+    structures = []
+
+    for domain_id in domain_ids:
+        sequence, structure = load_domain_from_pdb(domain_id, structures_base_dir, domain_type, should_download_pdbs)
+
+        if throw_if_failed:
+            if sequence is None:
+                raise Exception(f'Failed to load sequence of domain: {domain_id}')
+            elif structure is None:
+                raise Exception(f'Failed to load sequence of domain: {domain_id}')
+        
+        sequences.append(sequence)
+        structures.append(structure)
+    
+    return sequences, structures
