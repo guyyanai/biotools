@@ -64,12 +64,12 @@ def download_pdb_file(domain_id: str, domain_type: str, local_file_path: str):
     
     return local_file_path
 
-def load_domain_from_pdb(domain_id: str, structures_base_dir: str, domain_type: str, should_download_pdbs: bool):
+def load_domain_from_pdb(domain_id: str, structures_base_dir: str, domain_type: str, should_download_pdbs: bool, file_name_suffix = '.pdb'):
     
     if domain_type == 'ECOD-UID':
-        pdb_file_path = os.path.join(structures_base_dir, domain_id[2:7], domain_id, f"{domain_id}.pdb")
+        pdb_file_path = os.path.join(structures_base_dir, domain_id[2:7], domain_id, f"{domain_id}{file_name_suffix}")
     else:
-        pdb_file_path = os.path.join(structures_base_dir, f"{domain_id}.pdb")
+        pdb_file_path = os.path.join(structures_base_dir, f"{domain_id}{file_name_suffix}")
     
     if not os.path.exists(pdb_file_path):
         if not should_download_pdbs:
