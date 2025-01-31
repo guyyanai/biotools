@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="biotools",               # Replace with your library's name
-    version="0.0.12",
+    version="0.1.1",
     packages=find_packages(),        # Automatically finds modules and sub-packages
     description="Tools for Computational Biology",
     author="Guy Yanai",

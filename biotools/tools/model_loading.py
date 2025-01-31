@@ -1,8 +1,10 @@
+import os
 import torch
 from transformers import EsmTokenizer, EsmModel
 from esm.models.esm3 import ESM3
 from esm.utils.constants.models import ESM3_OPEN_SMALL
 from models.clss import CLSS
+from models.ProTrek.model.ProTrek.protrek_trimodal_model import ProTrekTrimodalModel
 
 def load_weights_from_checkpoint(checkpoint_path: str, weights_key_prefix: str):
     # Load the checkpoint
@@ -71,3 +73,28 @@ def load_clss(clss_checkpoint: str, device = None):
 
 def load_esm3(checkpoint=ESM3_OPEN_SMALL):
     return ESM3.from_pretrained(checkpoint)
+
+
+def load_protrek(size = "650M", protrek_weights_dir='/local/protrek/weights'):
+    if size == "650M":
+        config = {
+            "protein_config": os.path.join(protrek_weights_dir, 'ProTrek_650M_UniRef50/esm2_t33_650M_UR50D'),
+            "text_config": os.path.join(protrek_weights_dir, 'ProTrek_650M_UniRef50/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext'),
+            "structure_config": os.path.join(protrek_weights_dir, 'ProTrek_650M_UniRef50/foldseek_t30_150M'),
+            "load_protein_pretrained": False,
+            "load_text_pretrained": False,
+            "from_checkpoint": os.path.join(protrek_weights_dir, 'ProTrek_650M_UniRef50/ProTrek_650M_UniRef50.pt'),
+        }
+    elif size == "35M":
+        config = {
+            "protein_config": os.path.join(protrek_weights_dir, 'ProTrek_35M_UniRef50/esm2_t12_35M_UR50D'),
+            "text_config": os.path.join(protrek_weights_dir, 'ProTrek_35M_UniRef50/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext'),
+            "structure_config": os.path.join(protrek_weights_dir, 'ProTrek_35M_UniRef50/foldseek_t12_35M'),
+            "load_protein_pretrained": False,
+            "load_text_pretrained": False,
+            "from_checkpoint": os.path.join(protrek_weights_dir, 'ProTrek_35M_UniRef50/ProTrek_35M_UniRef50.pt'),
+        }
+    else:
+        raise Exception(f'Failed to load ProTrek model, the currently supported sizes are: 35M, 650M. Received size: {size}')
+
+    return ProTrekTrimodalModel(**config).to('cuda')
