@@ -103,6 +103,7 @@ def create_scatter_plot(
         )
 
     plt.savefig(output_file_path)
+    plt.close()
 
 
 def plot_reduced_dim(
@@ -278,6 +279,8 @@ def create_kde_plot(
         save_to_pickle(
             distributions, os.path.splitext(output_file)[0] + '.pkl'
         )
+    
+    plt.close()
 
 
 def save_to_pickle(data, path: str):
