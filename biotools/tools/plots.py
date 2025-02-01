@@ -56,7 +56,9 @@ def create_scatter_plot(
     line_group_name=None,
     legend_title=None,
     palette=None,
-    markers=None,
+    # markers=None,
+    alpha=1,
+    marker_size=40,
 ):
     if hue_name is not None:
         scatter_data = scatter_data.sort_values(by=hue_name)
@@ -77,8 +79,9 @@ def create_scatter_plot(
         palette=palette,
         data=scatter_data,
         legend="full",
-        alpha=1,
-        markers=markers,
+        alpha=alpha,
+        # markers=markers,
+        s=marker_size,
     )
 
     if line_group_name is not None:
@@ -120,7 +123,9 @@ def plot_reduced_dim(
     legend_title=None,
     jobs=DEFAULT_TSNE_JOBS,
     colors=None,
-    markers=None,
+    # markers=None,
+    alpha=1,
+    marker_size=40,
 ):
     os.makedirs(os.path.join(output_folder, run_name), exist_ok=True)
 
@@ -160,7 +165,9 @@ def plot_reduced_dim(
             shape_name=shape_column_name,
             legend_title=legend_title,
             palette=colors,
-            markers=markers,
+            # markers=markers,
+            alpha=alpha,
+            marker_size=marker_size,
         )
 
 
@@ -176,7 +183,7 @@ def create_pca_plots_with_shape(
     line_column_name=None,
     legend_title=None,
     colors=None,
-    markers=None,
+    # markers=None,
 ):
     print("Applying PCA...")
     pca_results = apply_pca(embeddings.numpy())
@@ -206,7 +213,7 @@ def create_pca_plots_with_shape(
         shape_name=shape_column_name,
         legend_title=legend_title,
         palette=colors,
-        markers=markers,
+        # markers=markers,
     )
 
 
@@ -276,10 +283,8 @@ def create_kde_plot(
     plt.savefig(output_file)
 
     if save_data:
-        save_to_pickle(
-            distributions, os.path.splitext(output_file)[0] + '.pkl'
-        )
-    
+        save_to_pickle(distributions, os.path.splitext(output_file)[0] + ".pkl")
+
     plt.close()
 
 
