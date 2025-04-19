@@ -17,13 +17,7 @@ DEFAULT_TSNE_JOBS = [
     (5, 1000),
     (10, 1000),
     (50, 1000),
-    (100, 1000),
-    (1, 5000),
-    (2, 5000),
-    (5, 5000),
-    (10, 5000),
-    (50, 5000),
-    (100, 5000),
+    (100, 1000)
 ]
 
 
@@ -71,18 +65,20 @@ def create_scatter_plot(
             cc.glasbey, n_colors=scatter_data[hue_name].nunique()
         )
 
-    sns.scatterplot(
-        x=x_name,
-        y=y_name,
-        hue=hue_name,
-        style=shape_name,
-        palette=palette,
-        data=scatter_data,
-        legend="full",
-        alpha=alpha,
-        # markers=markers,
-        s=marker_size,
-    )
+    for i, shape in enumerate(scatter_data[shape_name].unique()):
+        shape_dataset = scatter_data[scatter_data[shape_name] == shape]
+        sns.scatterplot(
+            x=x_name,
+            y=y_name,
+            hue=hue_name,
+            style=shape_name,
+            palette=palette,
+            data=shape_dataset,
+            legend="full",
+            alpha=alpha,
+            # markers=markers,
+            s=marker_size * (i + 1),
+        )
 
     if line_group_name is not None:
         for group, group_data in scatter_data.groupby(line_group_name):

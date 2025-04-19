@@ -51,6 +51,8 @@ def download_pdb_file(domain_id: str, domain_type: str, local_file_path: str):
         pdb_url = f'http://prodata.swmed.edu/ecod/af2_pdb/structure?id={domain_id}'
     elif domain_type == 'ECOD-UID':
         pdb_url = f'http://prodata.swmed.edu/ecod/af2_pdb/structure?uid={domain_id}'
+    elif domain_type == 'ECOD-UID-PDB':
+        pdb_url = f'http://prodata.swmed.edu/ecod/complete/structure?uid={domain_id}'
     else:
         raise Exception(f'Failed to create remote pdb url!\nDomain ID: {domain_id}\nDomain Type: {domain_type}\n')
     
@@ -66,7 +68,7 @@ def download_pdb_file(domain_id: str, domain_type: str, local_file_path: str):
 
 def load_domain_from_pdb(domain_id: str, structures_base_dir: str, domain_type: str, should_download_pdbs: bool, file_name_suffix = '.pdb'):
     
-    if domain_type == 'ECOD-UID':
+    if domain_type == 'ECOD-UID' or domain_type == 'ECOD-UID-PDB':
         pdb_file_path = os.path.join(structures_base_dir, domain_id[2:7], domain_id, f"{domain_id}{file_name_suffix}")
     else:
         pdb_file_path = os.path.join(structures_base_dir, f"{domain_id}{file_name_suffix}")
