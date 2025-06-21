@@ -1,9 +1,9 @@
-import os
 import torch
 from transformers import EsmTokenizer, EsmModel
 from esm.models.esm3 import ESM3
 from esm.utils.constants.models import ESM3_OPEN_SMALL
-from models.clss import CLSS
+from biotools.models.clss import CLSS
+from biotools.models.clss_v1 import CLSSv1
 
 def load_weights_from_checkpoint(checkpoint_path: str, weights_key_prefix: str):
     # Load the checkpoint
@@ -39,6 +39,15 @@ def load_esm2_from_checkpoint(esm2_config: str, checkpoint_path: str, weights_ke
     esm2_model.load_state_dict(esm2_weights)
     
     return esm2_model
+
+def load_clss_v1(clss_checkpoint: str, device = None):
+    # TODO: change this to normal loading
+    if device is None:
+        device = torch.device('cuda')
+    
+    model = CLSSv1.load_from_checkpoint(clss_checkpoint, strict=False).to(device)
+
+    return model.sequence_encoder, model.sequence_tokenizer, model.sequence_projection_head, model.structure_projection_head
 
 def load_clss(clss_checkpoint: str, device = None):
     if device is None:
