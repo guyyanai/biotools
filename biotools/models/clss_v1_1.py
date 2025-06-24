@@ -212,7 +212,7 @@ class CLSSv1_1(pl.LightningModule):
         projections2 = F.normalize(gathered_emb2, dim=1)
 
         # Compute cosine similarity
-        similarities = torch.mm(projections1, projections2.T) / self.temperature
+        similarities = torch.mm(projections1, projections2.T) / self.temperature.exp()
 
         # Labels for contrastive learning: diagonal elements should match
         labels = torch.arange(projections1.size(0), device=self.device)
