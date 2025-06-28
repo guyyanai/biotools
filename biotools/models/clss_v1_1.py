@@ -1,5 +1,4 @@
 from typing import List, Tuple
-import numpy as np
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
@@ -16,7 +15,7 @@ class CLSSv1_1(pl.LightningModule):
         esm2_checkpoint: str,
         hidden_dim: int,
         learning_rate: float = 1e-3,
-        init_temperature=np.log(1 / 0.07),
+        init_temperature=torch.log(torch.tensor(1 / 0.07, dtype=torch.float32)),
         should_learn_temperature: bool = True,
         random_sequence_stretches: bool = False,
         random_stretch_min_size: int = 30,
@@ -37,17 +36,15 @@ class CLSSv1_1(pl.LightningModule):
 
         self.structure_projection_head = nn.Sequential(nn.Linear(1536, hidden_dim))
 
+        self.temperature = nn.Parameter(init_temperature)
+
+        if not should_learn_temperature:
+            self.temperature.requires_grad = False
+
         self.learning_rate = learning_rate
         self.random_sequence_stretches = random_sequence_stretches
         self.random_stretch_min_size = random_stretch_min_size
         self.should_load_esm3 = should_load_esm3
-
-        self.temperature = nn.Parameter(
-            torch.tensor(init_temperature, dtype=torch.float32)
-        )
-
-        if not should_learn_temperature:
-            self.temperature.requires_grad = False
 
     def load_esm2(self, checkpoint: str) -> Tuple[EsmModel, EsmTokenizer]:
         # Load the pre-trained ESM2 tokenizer & model
@@ -212,16 +209,21 @@ class CLSSv1_1(pl.LightningModule):
         projections2 = F.normalize(gathered_emb2, dim=1)
 
         # Compute cosine similarity
-        similarities = torch.mm(projections1, projections2.T) * self.temperature.exp()
+        similarities = torch.mm(projections1, projections2.T)
+        scaled_similarities = similarities * self.temperature.exp()
 
         # Labels for contrastive learning: diagonal elements should match
         labels = torch.arange(projections1.size(0), device=self.device)
         loss_fn = nn.CrossEntropyLoss()
-        loss = loss_fn(similarities, labels)
+        loss = loss_fn(scaled_similarities, labels)
 
         # Log individual components (example: log mean similarity of positive pairs)
-        pos_similarity = similarities.detach().diag().mean()
-        self.log("pos_similarity", pos_similarity.cpu(), prog_bar=True, logger=True)
+        pos_similarity = similarities.detach().diag().mean().cpu()
+        scaled_pos_similarity = scaled_similarities.detach().diag().mean().cpu()
+
+        self.log("pos_similarity", pos_similarity, prog_bar=True, logger=True)
+        self.log("scaled_pos_similarity", scaled_pos_similarity, logger=True)
+
         self.log(
             "temperature", self.temperature.detach().cpu(), prog_bar=True, logger=True
         )

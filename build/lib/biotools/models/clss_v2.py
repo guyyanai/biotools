@@ -8,9 +8,9 @@ from esm.sdk.api import ESMProtein, SamplingConfig
 from esm.models.esm3 import ESM3
 from esm.utils.constants.models import ESM3_OPEN_SMALL
 
-class CLSSv1(pl.LightningModule):
+class CLSSv2(pl.LightningModule):
     def __init__(self, esm2_checkpoint: str, hidden_dim: int, learning_rate: float = 1e-3, temperature: float = 0.5, mask_probability: float = 0.15, random_sequence_stretches: bool = False, random_stretch_min_size: int = 30, should_load_esm3: bool = True):
-        super(CLSSv1, self).__init__()
+        super(CLSSv2, self).__init__()
         self.save_hyperparameters()
 
         self.sequence_encoder, self.sequence_tokenizer = self.load_esm2(esm2_checkpoint)
@@ -179,16 +179,20 @@ class CLSSv1(pl.LightningModule):
         projections2 = F.normalize(gathered_emb2, dim=1)
 
         # Compute cosine similarity
-        similarities = torch.mm(projections1, projections2.T) / self.hparams['temperature']
+        similarities = torch.mm(projections1, projections2.T)
+        scaled_similarities = similarities / self.hparams['temperature']
 
         # Labels for contrastive learning: diagonal elements should match
         labels = torch.arange(projections1.size(0), device=self.device)
         loss_fn = nn.CrossEntropyLoss()
-        loss = loss_fn(similarities, labels)
-        
+        loss = loss_fn(scaled_similarities, labels)
+
         # Log individual components (example: log mean similarity of positive pairs)
-        pos_similarity = similarities.detach().diag().mean()
-        self.log('pos_similarity', pos_similarity.cpu(), prog_bar=True, logger=True)
+        pos_similarity = similarities.detach().diag().mean().cpu()
+        scaled_pos_similarity = scaled_similarities.detach().diag().mean().cpu()
+
+        self.log("pos_similarity", pos_similarity, prog_bar=True, logger=True)
+        self.log("scaled_pos_similarity", scaled_pos_similarity, logger=True)
 
         return loss
 
