@@ -8,6 +8,7 @@ biotools/models/__init__.py
 biotools/models/clss.py
 biotools/models/clss_v1.py
 biotools/models/clss_v1_1.py
+biotools/models/clss_v1_2.py
 biotools/models/clss_v2.py
 biotools/tools/__init__.py
 biotools/tools/domain_loading.py

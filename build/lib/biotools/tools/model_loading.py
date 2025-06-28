@@ -5,6 +5,7 @@ from esm.utils.constants.models import ESM3_OPEN_SMALL
 from biotools.models.clss import CLSS
 from biotools.models.clss_v1 import CLSSv1
 from biotools.models.clss_v1_1 import CLSSv1_1
+from biotools.models.clss_v1_2 import CLSSv1_2
 from biotools.models.clss_v2 import CLSSv2
 
 
@@ -74,6 +75,20 @@ def load_clss_v1_1(clss_checkpoint: str, device=None):
         device = torch.device("cuda")
 
     model = CLSSv1_1.load_from_checkpoint(clss_checkpoint, strict=False).to(device)
+
+    return (
+        model.sequence_encoder,
+        model.sequence_tokenizer,
+        model.sequence_projection_head,
+        model.structure_projection_head,
+    )
+
+def load_clss_v1_2(clss_checkpoint: str, device=None):
+    # TODO: change this to normal loading
+    if device is None:
+        device = torch.device("cuda")
+
+    model = CLSSv1_2.load_from_checkpoint(clss_checkpoint, strict=False).to(device)
 
     return (
         model.sequence_encoder,
