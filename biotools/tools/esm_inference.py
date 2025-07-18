@@ -45,6 +45,46 @@ def esm3_infer_esm_protein(
     return embeddings_tensor
 
 
+def clss_v1_2_infer_sequences(
+    sequences: List[str],
+    esm2: EsmModel,
+    tokenizer: EsmTokenizer,
+    projection_head: torch.nn.Sequential,
+    should_normalize=False,
+    device=None,
+    use_tqdm=True,
+    move_to_cpu=False,
+    tqdm_desc="Inferring sequences using CLSS v1.2...",
+):
+    if device is None:
+        device = torch.device("cuda")
+
+    embeddings = []
+
+    for sequence in tqdm(sequences, desc=tqdm_desc) if use_tqdm else sequences:
+        tokenized = tokenizer(sequence, return_tensors="pt").to(device)
+
+        with torch.no_grad():
+            output = esm2(**tokenized)
+
+        embedding = output.last_hidden_state[0]
+        embedding_projection = projection_head(embedding)
+        mean_embedding = embedding_projection.mean(dim=0)
+        embeddings.append(mean_embedding)
+
+    embeddings_tensor = torch.stack(embeddings)
+
+    if should_normalize:
+        embeddings_tensor = F.normalize(embeddings_tensor, dim=1)
+
+    if move_to_cpu:
+        cpu_embeddings = embeddings_tensor.cpu()
+        del embeddings_tensor
+        return cpu_embeddings
+
+    return embeddings_tensor
+
+
 def esm2_infer_sequences(
     sequences: List[str],
     esm2: EsmModel,

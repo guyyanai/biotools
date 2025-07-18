@@ -6,10 +6,12 @@ biotools.egg-info/dependency_links.txt
 biotools.egg-info/top_level.txt
 biotools/models/__init__.py
 biotools/models/clss.py
+biotools/models/clss_non_lin.py
 biotools/models/clss_v1.py
 biotools/models/clss_v1_1.py
 biotools/models/clss_v1_2.py
 biotools/models/clss_v2.py
+biotools/models/clss_varying_temp.py
 biotools/tools/__init__.py
 biotools/tools/domain_loading.py
 biotools/tools/esm_inference.py
