@@ -19,7 +19,7 @@ class CLSSv1_2(pl.LightningModule):
         should_learn_temperature: bool = False,
         random_sequence_stretches: bool = False,
         random_stretch_min_size: int = 30,
-        should_load_esm3: bool = True,
+        should_load_esm3: bool = False,
     ):
         super(CLSSv1_2, self).__init__()
         self.save_hyperparameters()
