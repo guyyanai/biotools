@@ -66,21 +66,23 @@ def clss_v1_2_infer_sequences(
 
         with torch.no_grad():
             output = esm2(**tokenized)
+            del tokenized
+            embedding = output.last_hidden_state[0]
+            embedding_projection = projection_head(embedding)
+            mean_embedding = embedding_projection.mean(dim=0)
+            del output
 
-        embedding = output.last_hidden_state[0]
-        embedding_projection = projection_head(embedding)
-        mean_embedding = embedding_projection.mean(dim=0)
-        embeddings.append(mean_embedding)
+        if move_to_cpu:
+            cpu_embedding = mean_embedding.cpu()
+            del mean_embedding
+            embeddings.append(cpu_embedding)
+        else:
+            embeddings.append(mean_embedding)
 
     embeddings_tensor = torch.stack(embeddings)
 
     if should_normalize:
         embeddings_tensor = F.normalize(embeddings_tensor, dim=1)
-
-    if move_to_cpu:
-        cpu_embeddings = embeddings_tensor.cpu()
-        del embeddings_tensor
-        return cpu_embeddings
 
     return embeddings_tensor
 
