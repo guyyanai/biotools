@@ -7,6 +7,7 @@ from biotools.models.clss_v1 import CLSSv1
 from biotools.models.clss_v1_1 import CLSSv1_1
 from biotools.models.clss_v1_2 import CLSSv1_2
 from biotools.models.clss_v2 import CLSSv2
+from biotools.models.clss_varying_temp import CLSSVaryingTemp
 
 
 def load_weights_from_checkpoint(checkpoint_path: str, weights_key_prefix: str):
@@ -130,6 +131,21 @@ def load_clss_v2(clss_checkpoint: str, device=None):
         model.structure_projection_head,
     )
 
+def load_clss_varying_temp(clss_checkpoint: str, device=None):
+    # TODO: change this to normal loading
+    if device is None:
+        device = torch.device("cuda")
+
+    model = CLSSVaryingTemp.load_from_checkpoint(clss_checkpoint, strict=False).to(device)
+
+    esm2_tokenizer = EsmTokenizer.from_pretrained(model.model_name)
+
+    return (
+        model.esm2_model,
+        esm2_tokenizer,
+        model.esm2_projection_head,
+        model.esm3_projection_head,
+    )
 
 def load_clss(clss_checkpoint: str, device=None):
     if device is None:
